@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Episode;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,5 +15,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('index', [
+        'programs' => Episode::getProgramsList(),
+        'episodes' => Episode::canStreamLocally()
+            ->orderByDesc('published_at')
+            ->get(),
+    ]);
+})->name('index');
