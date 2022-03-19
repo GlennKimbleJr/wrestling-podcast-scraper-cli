@@ -126,7 +126,7 @@ class MegaphoneScrapper extends Command
         ], [
             'program' => $this->getProgram($publishedAt),
             'title' => $episode->title,
-            'summary' => $episode->summary,
+            'summary' => $episode->summary ?? '',
             'mp3' => $episode->audioUrl,
             'image' => $episode->imageUrl,
             'duration' => $episode->duration,
