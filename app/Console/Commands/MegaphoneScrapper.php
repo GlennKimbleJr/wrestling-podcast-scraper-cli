@@ -86,37 +86,49 @@ class MegaphoneScrapper extends Command
         return 0;
     }
 
-    private function getProgram(): ?string
+    private function getProgram(Carbon $publishedAt = null): ?string
     {
+        $program = $this->argument('program');
+
+        if ($program == 'grilling-jr'
+            && optional($publishedAt)->lte(Carbon::parse('2019-05-01')->endOfDay())
+        ) {
+            return 'The Ross Report';
+        }
+
         return Arr::get([
-            '83-weeks'  => '83 Weeks',
-            'my-world'  => 'My World',
-            'whw'       => 'What Happened When',
-        ], $this->argument('program'), null);
+            '83-weeks'      => '83 Weeks',
+            'my-world'      => 'My World',
+            'whw'           => 'What Happened When',
+            'grilling-jr'   => 'Grilling JR',
+        ], $program, null);
     }
 
     private function getUrl()
     {
         return 'https://player.megaphone.fm/playlist/' . Arr::get([
-            '83-weeks'  => 'WWO5563730202',
-            'my-world'  => 'WWO5330741307',
-            'whw'       => 'WWO2089228444',
+            '83-weeks'      => 'WWO5563730202',
+            'my-world'      => 'WWO5330741307',
+            'whw'           => 'WWO2089228444',
+            'grilling-jr'   => 'WWO8396779805',
         ], $this->argument('program'));
     }
 
     private function storeEpisode($episode): void
     {
+        $publishedAt = Carbon::parse($episode->pubDate);
+
         $localEpisode = Episode::firstOrCreate([
             'source' => 'megaphone.fm',
             'source_id' => $episode->uid,
         ], [
-            'program' => $this->getProgram(),
+            'program' => $this->getProgram($publishedAt),
             'title' => $episode->title,
             'summary' => $episode->summary,
             'mp3' => $episode->audioUrl,
             'image' => $episode->imageUrl,
             'duration' => $episode->duration,
-            'published_at' => Carbon::parse($episode->pubDate),
+            'published_at' => $publishedAt,
         ]);
 
         if ($localEpisode->wasRecentlyCreated) {
