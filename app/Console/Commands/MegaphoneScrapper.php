@@ -89,16 +89,18 @@ class MegaphoneScrapper extends Command
     private function getProgram(): ?string
     {
         return Arr::get([
-            '83-weeks' => '83 Weeks',
-            'my-world' => 'My World',
+            '83-weeks'  => '83 Weeks',
+            'my-world'  => 'My World',
+            'whw'       => 'What Happened When',
         ], $this->argument('program'), null);
     }
 
     private function getUrl()
     {
         return 'https://player.megaphone.fm/playlist/' . Arr::get([
-            '83-weeks' => 'WWO5563730202',
-            'my-world' => 'WWO5330741307',
+            '83-weeks'  => 'WWO5563730202',
+            'my-world'  => 'WWO5330741307',
+            'whw'       => 'WWO2089228444',
         ], $this->argument('program'));
     }
 
