@@ -60,6 +60,11 @@ class ScrapeMegaphoneTest extends TestCase
         $this->artisan('scrape arn');
         $this->assertEquals(1, Episode::whereProgram('ARN')->count());
 
+        $response = CreateMegaphoneResponse::init()->addEpisode(['uid' => 7])->generate();
+        $this->mockClient->shouldReceive('get')->once()->andReturn($response);
+        $this->artisan('scrape kurt-angle');
+        $this->assertEquals(1, Episode::whereProgram('The Kurt Angle Show')->count());
+
         $this->mockClient->shouldReceive('get')->never();
         $this->expectException(Exception::class);
         $this->artisan('scrape invalid-program');

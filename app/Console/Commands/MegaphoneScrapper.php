@@ -103,6 +103,7 @@ class MegaphoneScrapper extends Command
             'grilling-jr'   => 'Grilling JR',
             'something'     => 'Something to Wrestle',
             'arn'           => 'ARN',
+            'kurt-angle'    => 'The Kurt Angle Show',
         ], $program, null);
     }
 
@@ -115,6 +116,7 @@ class MegaphoneScrapper extends Command
             'grilling-jr'   => 'WWO8396779805',
             'something'     => 'WWO3531002211',
             'arn'           => 'WWO1389089569',
+            'kurt-angle'    => 'WWO7281860247',
         ], $this->argument('program'));
     }
 
