@@ -30,10 +30,15 @@ class ScrapeMegaphoneTest extends TestCase
     /** @test */
     public function a_valid_program_must_be_specified()
     {
-        $response = CreateMegaphoneResponse::init()->addEpisode()->generate();
+        $response = CreateMegaphoneResponse::init()->addEpisode(['uid' => 1])->generate();
         $this->mockClient->shouldReceive('get')->once()->andReturn($response);
         $this->artisan('scrape 83-weeks');
         $this->assertEquals(1, Episode::whereProgram('83 Weeks')->count());
+
+        $response = CreateMegaphoneResponse::init()->addEpisode(['uid' => 2])->generate();
+        $this->mockClient->shouldReceive('get')->once()->andReturn($response);
+        $this->artisan('scrape my-world');
+        $this->assertEquals(1, Episode::whereProgram('My World')->count());
 
         $this->mockClient->shouldReceive('get')->never();
         $this->expectException(Exception::class);

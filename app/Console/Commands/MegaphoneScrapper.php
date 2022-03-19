@@ -90,6 +90,7 @@ class MegaphoneScrapper extends Command
     {
         return Arr::get([
             '83-weeks' => '83 Weeks',
+            'my-world' => 'My World',
         ], $this->argument('program'), null);
     }
 
@@ -97,6 +98,7 @@ class MegaphoneScrapper extends Command
     {
         return 'https://player.megaphone.fm/playlist/' . Arr::get([
             '83-weeks' => 'WWO5563730202',
+            'my-world' => 'WWO5330741307',
         ], $this->argument('program'));
     }
 
