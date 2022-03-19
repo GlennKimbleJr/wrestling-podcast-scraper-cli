@@ -2,27 +2,36 @@
 
 namespace App\Console\Commands;
 
+use Exception;
 use Carbon\Carbon;
 use App\Models\Episode;
 use GuzzleHttp\Client;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 
-class Scraper extends Command
+class MegaphoneScrapper extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'scrape:83-weeks';
+    protected $signature = 'scrape {program}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Download episodes of the 83 Weeks podcast from Megaphone.fm';
+    protected $description = 'Download episodes of various podcasts from megaphone.fm';
+
+    /**
+     * The number of episodes added while parsing.
+     *
+     * @var integer
+     */
+    protected $added = 0;
 
     /**
      * The GuzzleHttp client.
@@ -31,12 +40,6 @@ class Scraper extends Command
      */
     protected $client;
 
-    /**
-     * The number of episodes added while parsing.
-     *
-     * @var integer
-     */
-    protected $added = 0;
 
     /**
      * Create a new command instance.
@@ -57,9 +60,11 @@ class Scraper extends Command
      */
     public function handle()
     {
-        $url = 'https://player.megaphone.fm/playlist/WWO5563730202';
+        if (! $this->getProgram()) {
+            throw new Exception('Invalid program');
+        }
 
-        $response = $this->client->get($url);
+        $response = $this->client->get($this->getUrl());
 
         if ($response->getStatusCode() !== 200) {
             return 0;
@@ -81,13 +86,27 @@ class Scraper extends Command
         return 0;
     }
 
+    private function getProgram(): ?string
+    {
+        return Arr::get([
+            '83-weeks' => '83 Weeks',
+        ], $this->argument('program'), null);
+    }
+
+    private function getUrl()
+    {
+        return 'https://player.megaphone.fm/playlist/' . Arr::get([
+            '83-weeks' => 'WWO5563730202',
+        ], $this->argument('program'));
+    }
+
     private function storeEpisode($episode): void
     {
         $localEpisode = Episode::firstOrCreate([
             'source' => 'megaphone.fm',
             'source_id' => $episode->uid,
         ], [
-            'program' => '83 Weeks',
+            'program' => $this->getProgram(),
             'title' => $episode->title,
             'summary' => $episode->summary,
             'mp3' => $episode->audioUrl,

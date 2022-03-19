@@ -7,7 +7,7 @@ use Carbon\Carbon;
 use Tests\TestCase;
 use GuzzleHttp\Client;
 use App\Models\Episode;
-use Tests\Helpers\Create83WeeksResponse;
+use Tests\Helpers\CreateMegaphoneResponse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class Scrape83WeeksTest extends TestCase
@@ -30,7 +30,7 @@ class Scrape83WeeksTest extends TestCase
     /** @test */
     public function podcast_can_be_scraped()
     {
-        $response = Create83WeeksResponse::init()
+        $response = CreateMegaphoneResponse::init()
             ->addEpisode()
             ->generate();
 
@@ -40,7 +40,7 @@ class Scrape83WeeksTest extends TestCase
             ->with('https://player.megaphone.fm/playlist/WWO5563730202')
             ->andReturn($response);
 
-        $this->artisan('scrape:83-weeks');
+        $this->artisan('scrape 83-weeks');
 
         $episode = Episode::first();
         $this->assertEquals(1, Episode::count());
@@ -53,24 +53,5 @@ class Scrape83WeeksTest extends TestCase
         $this->assertEquals('download.jpg', $episode->image);
         $this->assertEquals('1234', $episode->duration);
         $this->assertEquals(now()->format('Y-m-d'), $episode->published_at->format('Y-m-d'));
-    }
-
-    /** @test */
-    public function a_200_status_code_must_be_returned()
-    {
-        $response = Create83WeeksResponse::init()
-            ->setStatusCode(404)
-            ->addEpisode()
-            ->generate();
-
-        $this->mockClient
-            ->shouldReceive('get')
-            ->once()
-            ->with('https://player.megaphone.fm/playlist/WWO5563730202')
-            ->andReturn($response);
-
-        $this->artisan('scrape:83-weeks');
-
-        $this->assertEquals(0, Episode::count());
     }
 }

@@ -5,7 +5,7 @@ namespace Tests\Helpers;
 use GuzzleHttp\Psr7\Response;
 
 
-class Create83WeeksResponse
+class CreateMegaphoneResponse
 {
     private $statusCode = 200;
     private $nextUrl = null;
