@@ -23,7 +23,8 @@ class CreateEpisodesTable extends Migration
             $table->text('image');
             $table->text('mp3');
             $table->text('duration');
-            $table->timestamp('published_at');
+            $table->boolean('local')->default(false);
+            $table->timestamp('published_at')->nullable();
             $table->timestamps();
         });
     }
@@ -35,6 +36,6 @@ class CreateEpisodesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('episodes');
+        //
     }
 }
