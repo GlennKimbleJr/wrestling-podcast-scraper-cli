@@ -87,14 +87,4 @@ class ScrapeMegaphoneTest extends TestCase
 
         $this->assertEquals(0, Episode::count());
     }
-
-    /** @test */
-    public function handle_null_summary()
-    {
-        $response = CreateMegaphoneResponse::init()->addEpisode(['summary' => null])->generate();
-        $this->mockClient->shouldReceive('get')->once()->andReturn($response);
-        $this->artisan('scrape something');
-        $this->assertEquals(1, Episode::whereProgram('Something to Wrestle')->count());
-        $this->assertEquals('', Episode::whereProgram('Something to Wrestle')->first()->summary);
-    }
 }

@@ -72,12 +72,16 @@ class EpisodeTest extends TestCase
     /** @test */
     public function list_of_episodes_that_can_stream_locally()
     {
-        $local = Episode::factory()->create(['local' => 1]);
-        $notLocal = Episode::factory()->create(['local' => 0]);
+        $local = Episode::factory()->create(['local' => 1, 'mp3' => 'test.mp3']);
+        $notLocal = Episode::factory()->create(['local' => 0, 'mp3' => null]);
+        $notLocal2 = Episode::factory()->create(['local' => 1, 'mp3' => null]);
+        $notLocal3 = Episode::factory()->create(['local' => 0, 'mp3' => 'test.mp3']);
         
         $localEpisodes = Episode::canStreamLocally()->get();
 
         $this->assertTrue($localEpisodes->contains($local));
         $this->assertFalse($localEpisodes->contains($notLocal));
+        $this->assertFalse($localEpisodes->contains($notLocal2));
+        $this->assertFalse($localEpisodes->contains($notLocal3));
     }
 }

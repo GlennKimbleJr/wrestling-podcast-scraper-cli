@@ -48,7 +48,7 @@ class Episode extends Model
 
     public function scopeCanStreamLocally($query)
     {
-        return $query->whereLocal(1);
+        return $query->whereLocal(1)->whereNotNull('mp3');
     }
 
     public function scopeGetProgramsList($query)

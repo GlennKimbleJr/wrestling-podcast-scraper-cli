@@ -15,14 +15,14 @@ class CreateEpisodesTable extends Migration
     {
         Schema::create('episodes', function (Blueprint $table) {
             $table->id();
-            $table->text('source');
-            $table->text('source_id');
-            $table->text('program');
-            $table->text('title');
-            $table->text('summary');
-            $table->text('image');
-            $table->text('mp3');
-            $table->text('duration');
+            $table->string('source');
+            $table->string('source_id');
+            $table->string('program');
+            $table->string('title');
+            $table->text('summary')->nullable();
+            $table->string('image')->nullable();
+            $table->string('mp3')->nullable();
+            $table->string('duration')->nullable();
             $table->boolean('local')->default(false);
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
