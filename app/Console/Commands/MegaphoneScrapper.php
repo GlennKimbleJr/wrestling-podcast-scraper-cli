@@ -101,6 +101,7 @@ class MegaphoneScrapper extends Command
             'my-world'      => 'My World',
             'whw'           => 'What Happened When',
             'grilling-jr'   => 'Grilling JR',
+            'something'     => 'Something to Wrestle',
         ], $program, null);
     }
 
@@ -111,6 +112,7 @@ class MegaphoneScrapper extends Command
             'my-world'      => 'WWO5330741307',
             'whw'           => 'WWO2089228444',
             'grilling-jr'   => 'WWO8396779805',
+            'something'     => 'WWO3531002211',
         ], $this->argument('program'));
     }
 
