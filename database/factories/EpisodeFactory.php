@@ -48,7 +48,7 @@ class EpisodeFactory extends Factory
             'mp3' => 'download.mp3',
             'duration' => '1234',
             'published_at' => now()->subDays(rand(1, 45))->startOfDay(),
-            'local' => 0,
+            'local' => 1,
         ];
     }
 }
