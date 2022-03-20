@@ -29,4 +29,21 @@ class ViewEpisodesTest extends TestCase
                     && $programs->contains('My World');
             });
     }
+
+    /** @test */
+    public function filter_by_program()
+    {
+        $expectedEpisode1 = Episode::factory()->create(['program' => 'What Happened When']);
+        $expectedEpisode2 = Episode::factory()->create(['program' => 'What Happened When']);
+        $unexpectedEpisode = Episode::factory()->create(['program' => 'The Ross Report']);
+
+        $this->get(route('program', ['what-happened-when']))
+            ->assertStatus(200)
+            ->assertViewHas('episodes', function ($episodes)
+                use ($expectedEpisode1, $expectedEpisode2, $unexpectedEpisode) {
+                    return $episodes->contains($expectedEpisode1)
+                        && $episodes->contains($expectedEpisode2)
+                        && ! $episodes->contains($unexpectedEpisode);
+                });
+    }
 }

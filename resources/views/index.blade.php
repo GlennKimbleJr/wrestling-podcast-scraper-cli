@@ -4,9 +4,9 @@
     </head>
     <body class="bg-dark">
         <div class="m-2">
-            <a href="#" class="btn btn-sm {{ isset($selectedProgram) ? 'btn-dark' : 'btn-primary' }}">Home</a>
+            <a href="{{ route('index') }}" class="btn btn-sm {{ isset($selectedProgram) ? 'btn-dark' : 'btn-primary' }}">Home</a>
             @foreach ($programs as $slug => $program)
-                <a href="#" class="btn btn-sm {{ (isset($selectedProgram) && $selectedProgram == $slug) ? 'btn-primary' : 'btn-dark' }}">{{ $program }}</a>
+                <a href="{{ route('program', [$slug]) }}" class="btn btn-sm {{ (isset($selectedProgram) && $selectedProgram == $slug) ? 'btn-primary' : 'btn-dark' }}">{{ $program }}</a>
             @endforeach
         </div>
 
@@ -33,7 +33,7 @@
                     @foreach($episodes as $episode)
                     <tr>
                         <td>
-                            <a href="#">
+                            <a href="{{ route('program', [$episode->program_slug]) }}">
                                 {{ $episode->program }}
                             </a>
                         </td>

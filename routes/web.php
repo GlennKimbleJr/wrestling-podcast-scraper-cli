@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Episode;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,3 +24,16 @@ Route::get('/', function () {
             ->get(),
     ]);
 })->name('index');
+
+Route::get('/programs/{program}', function (Request $request, string $program) {
+    return view('index', [
+        'selectedProgram' => $program,
+        'programs' => Episode::getProgramsList(),
+        'episodes' => Episode::canStreamLocally()
+            ->whereProgram(
+                Str::of($program)->replace('-', ' ')->title()
+            )
+            ->orderByDesc('published_at')
+            ->get(),
+    ]);
+})->name('program');
