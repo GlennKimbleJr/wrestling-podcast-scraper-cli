@@ -63,7 +63,7 @@ class Episode extends Model
 
     public function getLocalMp3PathAttribute()
     {
-        return "mp3s/{$this->program}/"
+        return "/mp3s/{$this->program}/"
             . $this->published_at->format('Y-m-d')
             . "-{$this->source_id}.mp3";
     }

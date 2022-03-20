@@ -41,7 +41,7 @@
                         <td>{{ $episode->title }}</td>
                         <td class="text-right">
                           <a
-                            href="#"
+                            href="{{ route('episode', $episode) }}"
                             target="_blank"
                             class="btn btn-dark"
                           >

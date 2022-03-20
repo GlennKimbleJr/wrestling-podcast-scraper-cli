@@ -37,3 +37,9 @@ Route::get('/programs/{program}', function (Request $request, string $program) {
             ->get(),
     ]);
 })->name('program');
+
+Route::get('/episodes/{episode}', function(Request $request, Episode $episode) {
+    return view('episode', [
+        'episode' => $episode,
+    ]);
+})->name('episode');

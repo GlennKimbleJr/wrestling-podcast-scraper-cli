@@ -46,4 +46,16 @@ class ViewEpisodesTest extends TestCase
                         && ! $episodes->contains($unexpectedEpisode);
                 });
     }
+
+    /** @test */
+    public function individual_episodes_can_be_viewed()
+    {
+        $expectedEpisode = Episode::factory()->create();
+
+        $this->get(route('episode', $expectedEpisode))
+        ->assertStatus(200)
+        ->assertViewHas('episode', function ($actualEpisode) use ($expectedEpisode) {
+            return $actualEpisode->is($expectedEpisode);
+        });
+    }
 }
