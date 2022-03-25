@@ -77,6 +77,7 @@ class DownloadMp3 extends Command
             $episode = Episode::query()
                 ->whereLocal(0)
                 ->whereNotIn('id', $this->errors)
+                ->whereNotIn('program', ['The Ross Report'])
                 ->inRandomOrder()
                 ->firstOrFail();
 

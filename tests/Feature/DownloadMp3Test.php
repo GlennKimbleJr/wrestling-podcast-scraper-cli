@@ -52,4 +52,14 @@ class DownloadMp3Test extends TestCase
 
         Queue::assertPushed(DownloadEpisodeJob::class, 2);
     }
+
+    /** @test */
+    public function the_ross_report_will_not_be_downloaded()
+    {
+        Episode::factory()->create(['program' => 'The Ross Report', 'local' => 0]);
+
+        $this->expectException(Exception::class);
+
+        $this->artisan('download');
+    }
 }
