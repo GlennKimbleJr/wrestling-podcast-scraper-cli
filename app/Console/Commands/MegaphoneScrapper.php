@@ -173,20 +173,28 @@ class MegaphoneScrapper extends Command
     /**
      * Get the appropriate program title based on the program argument provided.
      *
-     * @var Carbon|null $publishedAt
+     * @var Carbon $publishedAt
      *
      * @return string
      */
-    private function getProgramTitle(?Carbon $publishedAt): string
+    private function getProgramTitle(Carbon $publishedAt): string
     {
         $program = $this->argument('program');
 
-        if ($program == 'grilling-jr'
-            && optional($publishedAt)->lte(Carbon::parse('2019-05-01')->endOfDay())
-        ) {
+        if ($program == 'grilling-jr' && $publishedAt->lte($this->getRossReportCutoffDate())) {
             return 'The Ross Report';
         }
 
         return (string) Arr::get($this->programs, "{$program}.title");
+    }
+
+    /**
+     * Get the cutoff date for when The Ross Report becomes Grilling Jr.
+     *
+     * @return Carbon
+     */
+    private function getRossReportCutoffDate(): Carbon
+    {
+        return Carbon::parse('2019-05-01')->endOfDay();
     }
 }
