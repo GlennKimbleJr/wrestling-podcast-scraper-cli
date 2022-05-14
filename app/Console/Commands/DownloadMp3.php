@@ -50,12 +50,7 @@ class DownloadMp3 extends Command
                 $this->info('');
             }
 
-            $episode = Episode::query()
-                ->whereLocal(0)
-                ->whereNotIn('id', $this->errors)
-                ->whereNotIn('program', ['The Ross Report'])
-                ->inRandomOrder()
-                ->first();
+            $episode = $this->getNextEpisode();
 
             if (! $episode) {
                 $this->warn('There are no episodes available to download.');
@@ -63,27 +58,76 @@ class DownloadMp3 extends Command
                 return 1;
             }
 
-            $this->info(
-                $episode->published_at->format('Y-m-d') . ' - ' . $episode->program
-            );
-
-            $this->info($episode->title);
-
-            try {
-                DownloadEpisodeJob::dispatch($episode);
-            } catch (Exception $e) {
-                $this->errors[] = $episode->id;
-                $this->error('Error while downloading.');
-            }
-
+            $this->printDetails($episode);
+            $this->download($episode);
             $this->info("{$count} of {$amount} Complete");
-            $count++;
+            $this->sleep();
 
-            if (! App::runningUnitTests()) {
-                sleep(10);
-            }
+            $count++;
         }
 
         return 0;
+    }
+
+    /**
+     * Attempt to retrieve the next episode to be downloaded.
+     *
+     * @return Episode|null
+     */
+    private function getNextEpisode(): ?Episode
+    {
+        return Episode::query()
+            ->whereLocal(0)
+            ->whereNotIn('id', $this->errors)
+            ->whereNotIn('program', ['The Ross Report'])
+            ->inRandomOrder()
+            ->first();
+    }
+
+    /**
+     * Print episode details to the console.
+     *
+     * @param Episode $episode
+     *
+     * @return void
+     */
+    private function printDetails(Episode $episode): void
+    {
+        $this->info(
+            $episode->published_at->format('Y-m-d') . ' - ' . $episode->program
+        );
+
+        $this->info($episode->title);
+    }
+
+    /**
+     * Attempt to download the episode.
+     *
+     * @param Episode $episode
+     *
+     * @return void
+     */
+    private function download(Episode $episode): void
+    {
+        try {
+            DownloadEpisodeJob::dispatch($episode);
+        } catch (Exception $e) {
+            $this->errors[] = $episode->id;
+            $this->error('Error while downloading.');
+        }
+    }
+
+    /**
+     * Sleep for a given numer of seconds. Used for rate limiting.
+     *
+     * @return void
+     */
+    private function sleep(): void
+    {
+        if (App::runningUnitTests()) {
+            return;
+        }
+
+        sleep(10);
     }
 }
