@@ -27,18 +27,18 @@ class MegaphoneScrapper extends Command
     protected $description = 'Download episodes of various podcasts from megaphone.fm';
 
     /**
-     * The number of episodes added while parsing.
-     *
-     * @var integer
-     */
-    protected $added = 0;
-
-    /**
      * The GuzzleHttp client.
      *
      * @var Client
      */
     protected $client;
+
+    /**
+     * The number of episodes added while parsing.
+     *
+     * @var integer
+     */
+    protected $added = 0;
 
     /**
      * A list of valid programs we can scrape with their ids and title.s
@@ -113,7 +113,6 @@ class MegaphoneScrapper extends Command
             $response->getBody()->getContents()
         );
 
-
         foreach ($contents->episodes as $episode) {
             $this->storeEpisode($episode);
         }
@@ -135,13 +134,20 @@ class MegaphoneScrapper extends Command
         return (bool) Arr::get($this->programs, $this->argument('program'));
     }
 
-    private function getUrl()
+    /**
+     * Return the appropriate podcast url for the provided program argument.
+     *
+     * @return string
+     */
+    private function getUrl(): string
     {
-        $key = $this->argument('program') . '.id';
-
-        return 'https://player.megaphone.fm/playlist/' . Arr::get($this->programs, $key);
+        return 'https://player.megaphone.fm/playlist/'
+            . Arr::get($this->programs, "{$this->argument('program')}.id");
     }
 
+    /**
+     * Save the given episode to the database if it doesn't already exist.
+     */
     private function storeEpisode($episode): void
     {
         $publishedAt = Carbon::parse($episode->pubDate);
