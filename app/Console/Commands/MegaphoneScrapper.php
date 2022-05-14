@@ -41,7 +41,7 @@ class MegaphoneScrapper extends Command
     protected $added = 0;
 
     /**
-     * A list of valid programs we can scrape with their ids and title.s
+     * A list of valid programs we can scrape with their ids and titles.
      *
      * @var array
      */
