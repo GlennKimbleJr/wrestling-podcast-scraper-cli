@@ -114,7 +114,9 @@ class MegaphoneScrapper extends Command
         );
 
         foreach ($contents->episodes as $episode) {
-            $this->storeEpisode($episode);
+            if ($this->storeNewEpisode($episode)) {
+                $this->added++;
+            }
         }
 
         $this->info(
@@ -147,8 +149,10 @@ class MegaphoneScrapper extends Command
 
     /**
      * Save the given episode to the database if it doesn't already exist.
+     *
+     * @return bool
      */
-    private function storeEpisode($episode): void
+    private function storeNewEpisode($episode): bool
     {
         $publishedAt = Carbon::parse($episode->pubDate);
 
@@ -165,9 +169,7 @@ class MegaphoneScrapper extends Command
             'published_at' => $publishedAt,
         ]);
 
-        if ($localEpisode->wasRecentlyCreated) {
-            $this->added++;
-        }
+        return (bool) $localEpisode->wasRecentlyCreated;
     }
 
     /**
