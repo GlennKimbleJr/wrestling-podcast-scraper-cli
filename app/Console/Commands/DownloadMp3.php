@@ -26,20 +26,11 @@ class DownloadMp3 extends Command
     protected $description = 'Download a random episode.';
 
     /**
+     * A list of episode id's that failed to download.
+     *
      * @var array
      */
     protected $errors = [];
-
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Execute the console command.
@@ -48,32 +39,17 @@ class DownloadMp3 extends Command
      */
     public function handle()
     {
-        $count = 1;
         $amount = (int) $this->argument('amount') ?? 1;
         if ($amount == 0) {
             $amount = 1;
         }
 
+        $count = 1;
         while ($count <= $amount) {
             if ($count > 1) {
                 $this->info('');
             }
 
-            $this->download($count, $amount);
-
-            $count++;
-
-            if (! App::runningUnitTests()) {
-                sleep(10);
-            }
-        }
-
-        return 0;
-    }
-
-    private function download($count, $amount)
-    {
-        try {
             $episode = Episode::query()
                 ->whereLocal(0)
                 ->whereNotIn('id', $this->errors)
@@ -87,12 +63,21 @@ class DownloadMp3 extends Command
 
             $this->info($episode->title);
 
-            DownloadEpisodeJob::dispatch($episode);
+            try {
+                DownloadEpisodeJob::dispatch($episode);
+            } catch (Exception $e) {
+                $this->errors[] = $episode->id;
+                $this->error('Error while downloading.');
+            }
 
-            $this->warn("{$count} of {$amount} Complete");
-        } catch (Exception $e) {
-            $this->errors[] = $episode->id;
-            $this->error('Error while downloading.');
+            $this->info("{$count} of {$amount} Complete");
+            $count++;
+
+            if (! App::runningUnitTests()) {
+                sleep(10);
+            }
         }
+
+        return 0;
     }
 }
