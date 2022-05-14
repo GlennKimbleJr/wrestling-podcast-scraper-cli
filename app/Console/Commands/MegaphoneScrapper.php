@@ -40,6 +40,41 @@ class MegaphoneScrapper extends Command
      */
     protected $client;
 
+    /**
+     * A list of valid programs we can scrape with their ids and title.s
+     *
+     * @var array
+     */
+    protected $programs = [
+        '83-weeks' => [
+            'id' => 'WWO5563730202',
+            'title' => '83 Weeks',
+        ],
+        'my-world' => [
+            'id' => 'WWO5330741307',
+            'title' => 'My World',
+        ],
+        'whw' => [
+            'id' => 'WWO2089228444',
+            'title' => 'What Happened When',
+        ],
+        'grilling-jr' => [
+            'id' => 'WWO8396779805',
+            'title' => 'Grilling JR',
+        ],
+        'something' => [
+            'id' => 'WWO3531002211',
+            'title' => 'Something to Wrestle',
+        ],
+        'arn' => [
+            'id' => 'WWO1389089569',
+            'title' => 'ARN',
+        ],
+        'kurt-angle' => [
+            'id' => 'WWO7281860247',
+            'title' => 'The Kurt Angle Show',
+        ],
+    ];
 
     /**
      * Create a new command instance.
@@ -60,8 +95,10 @@ class MegaphoneScrapper extends Command
      */
     public function handle()
     {
-        if (! $this->getProgram()) {
-            throw new Exception('Invalid program');
+        if (! $this->isValidProgram()) {
+            $this->error('Invalid program');
+
+            return 1;
         }
 
         $response = $this->client->get($this->getUrl());
@@ -88,38 +125,21 @@ class MegaphoneScrapper extends Command
         return 0;
     }
 
-    private function getProgram(Carbon $publishedAt = null): ?string
+    /**
+     * Validates that the provided program argument is safe to use.
+     *
+     * @return bool
+     */
+    private function isValidProgram(): bool
     {
-        $program = $this->argument('program');
-
-        if ($program == 'grilling-jr'
-            && optional($publishedAt)->lte(Carbon::parse('2019-05-01')->endOfDay())
-        ) {
-            return 'The Ross Report';
-        }
-
-        return Arr::get([
-            '83-weeks'      => '83 Weeks',
-            'my-world'      => 'My World',
-            'whw'           => 'What Happened When',
-            'grilling-jr'   => 'Grilling JR',
-            'something'     => 'Something to Wrestle',
-            'arn'           => 'ARN',
-            'kurt-angle'    => 'The Kurt Angle Show',
-        ], $program, null);
+        return (bool) Arr::get($this->programs, $this->argument('program'));
     }
 
     private function getUrl()
     {
-        return 'https://player.megaphone.fm/playlist/' . Arr::get([
-            '83-weeks'      => 'WWO5563730202',
-            'my-world'      => 'WWO5330741307',
-            'whw'           => 'WWO2089228444',
-            'grilling-jr'   => 'WWO8396779805',
-            'something'     => 'WWO3531002211',
-            'arn'           => 'WWO1389089569',
-            'kurt-angle'    => 'WWO7281860247',
-        ], $this->argument('program'));
+        $key = $this->argument('program') . '.id';
+
+        return 'https://player.megaphone.fm/playlist/' . Arr::get($this->programs, $key);
     }
 
     private function storeEpisode($episode): void
@@ -130,7 +150,7 @@ class MegaphoneScrapper extends Command
             'source' => 'megaphone.fm',
             'source_id' => $episode->uid,
         ], [
-            'program' => $this->getProgram($publishedAt),
+            'program' => $this->getProgramTitle($publishedAt),
             'title' => $episode->title,
             'summary' => $episode->summary,
             'mp3' => $episode->audioUrl,
@@ -142,5 +162,25 @@ class MegaphoneScrapper extends Command
         if ($localEpisode->wasRecentlyCreated) {
             $this->added++;
         }
+    }
+
+    /**
+     * Get the appropriate program title based on the program argument provided.
+     *
+     * @var Carbon|null $publishedAt
+     *
+     * @return string
+     */
+    private function getProgramTitle(?Carbon $publishedAt): string
+    {
+        $program = $this->argument('program');
+
+        if ($program == 'grilling-jr'
+            && optional($publishedAt)->lte(Carbon::parse('2019-05-01')->endOfDay())
+        ) {
+            return 'The Ross Report';
+        }
+
+        return (string) Arr::get($this->programs, "{$program}.title");
     }
 }

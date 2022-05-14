@@ -66,8 +66,9 @@ class ScrapeMegaphoneTest extends TestCase
         $this->assertEquals(1, Episode::whereProgram('The Kurt Angle Show')->count());
 
         $this->mockClient->shouldReceive('get')->never();
-        $this->expectException(Exception::class);
-        $this->artisan('scrape invalid-program');
+        $this->artisan('scrape invalid-program')
+            ->expectsOutput('Invalid program')
+            ->assertExitCode(1);
     }
 
     /** @test */
