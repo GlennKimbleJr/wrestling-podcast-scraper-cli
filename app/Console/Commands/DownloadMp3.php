@@ -39,15 +39,13 @@ class DownloadMp3 extends Command
      */
     public function handle()
     {
-        $amount = (int) $this->argument('amount') ?? 1;
-        if ($amount == 0) {
-            $amount = 1;
-        }
-
+        $amount = (int) $this->argument('amount');
         $count = 1;
+
         while ($count <= $amount) {
+            // add a blank line in-between iterations.
             if ($count > 1) {
-                $this->info('');
+                $this->newLine();
             }
 
             $episode = $this->getNextEpisode();
