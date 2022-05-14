@@ -16,6 +16,11 @@ class DownloadEpisodeJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * The given episode we're trying to download.
+     *
+     * @var Episode
+     */
     public $episode;
 
     /**
@@ -33,7 +38,7 @@ class DownloadEpisodeJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         if ($this->episode->local) {
             return;
@@ -48,19 +53,34 @@ class DownloadEpisodeJob implements ShouldQueue
         ]);
     }
 
-    private function setupDirectory($path)
+    /**
+     * Creates the directory if it doesn't exist.
+     *
+     * @return void
+     */
+    private function setupDirectory($path): void
     {
         if(! file_exists($path)) {
             mkdir($path, 0777, true);
         }
     }
 
-    private function getFileName()
+    /**
+     * Generates the appropriate file name for the episode.
+     *
+     * @return string
+     */
+    private function getFileName(): string
     {
         return $this->episode->published_at->format('Y-m-d') .  '-' . $this->episode->source_id . '.mp3';
     }
 
-    private function downloadFile($path)
+    /**
+     * Downloads the file to the given path.
+     *
+     * @return void
+     */
+    private function downloadFile($path): void
     {
         $stream = Utils::streamFor(
             fopen($path . '/' . $this->getFileName(), 'w')

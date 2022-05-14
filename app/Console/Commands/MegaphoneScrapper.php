@@ -93,7 +93,7 @@ class MegaphoneScrapper extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         if (! $this->isValidProgram()) {
             $this->error('Invalid program');
@@ -175,7 +175,7 @@ class MegaphoneScrapper extends Command
     /**
      * Get the appropriate program title based on the program argument provided.
      *
-     * @var Carbon $publishedAt
+     * @param Carbon $publishedAt
      *
      * @return string
      */
