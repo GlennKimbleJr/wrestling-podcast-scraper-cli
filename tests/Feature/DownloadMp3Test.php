@@ -39,7 +39,7 @@ class DownloadMp3Test extends TestCase
 
         $this->artisan('download')
             ->expectsOutput('There are no episodes available to download.')
-            ->assertExitCode(1);
+            ->assertExitCode(0);
     }
 
     /** @test */
@@ -60,6 +60,6 @@ class DownloadMp3Test extends TestCase
 
         $this->artisan('download')
             ->expectsOutput('There are no episodes available to download.')
-            ->assertExitCode(1);
+            ->assertExitCode(0);
     }
 }

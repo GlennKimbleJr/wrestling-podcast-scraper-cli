@@ -55,7 +55,7 @@ class DownloadMp3 extends Command
             if (! $episode) {
                 $this->warn('There are no episodes available to download.');
 
-                return 1;
+                return 0;
             }
 
             $this->printDetails($episode);
