@@ -37,9 +37,9 @@ class DownloadMp3Test extends TestCase
     {
         $nonLocalEpisode = Episode::factory()->create(['local' => 1]);
 
-        $this->expectException(Exception::class);
-
-        $this->artisan('download');
+        $this->artisan('download')
+            ->expectsOutput('There are no episodes available to download.')
+            ->assertExitCode(1);
     }
 
     /** @test */
@@ -58,8 +58,8 @@ class DownloadMp3Test extends TestCase
     {
         Episode::factory()->create(['program' => 'The Ross Report', 'local' => 0]);
 
-        $this->expectException(Exception::class);
-
-        $this->artisan('download');
+        $this->artisan('download')
+            ->expectsOutput('There are no episodes available to download.')
+            ->assertExitCode(1);
     }
 }

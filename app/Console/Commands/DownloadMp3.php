@@ -55,7 +55,13 @@ class DownloadMp3 extends Command
                 ->whereNotIn('id', $this->errors)
                 ->whereNotIn('program', ['The Ross Report'])
                 ->inRandomOrder()
-                ->firstOrFail();
+                ->first();
+
+            if (! $episode) {
+                $this->warn('There are no episodes available to download.');
+
+                return 1;
+            }
 
             $this->info(
                 $episode->published_at->format('Y-m-d') . ' - ' . $episode->program
