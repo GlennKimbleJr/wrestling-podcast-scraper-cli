@@ -67,7 +67,9 @@ class MegaphoneScrapper extends Command
         $response = $this->client->get($this->getUrl());
 
         if ($response->getStatusCode() !== 200) {
-            return 0;
+            $this->error('Error retrieving rss feed.');
+
+            return 1;
         }
 
         $contents = json_decode(

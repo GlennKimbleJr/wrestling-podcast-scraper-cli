@@ -83,7 +83,9 @@ class ScrapeMegaphoneTest extends TestCase
             ->once()
             ->andReturn($response);
 
-        $this->artisan('scrape 83-weeks');
+        $this->artisan('scrape 83-weeks')
+            ->expectsOutput('Error retrieving rss feed.')
+            ->assertExitCode(1);
 
         $this->assertEquals(0, Episode::count());
     }
