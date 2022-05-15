@@ -25,7 +25,7 @@ class DownloadMp3Test extends TestCase
     {
         $nonLocalEpisode = Episode::factory()->create(['local' => 0]);
 
-        $this->artisan('download');
+        $this->artisan('download --sleep=0');
 
         Queue::assertPushed(function (DownloadEpisodeJob $job) use ($nonLocalEpisode) {
             return $job->episode->is($nonLocalEpisode);
@@ -37,7 +37,7 @@ class DownloadMp3Test extends TestCase
     {
         $nonLocalEpisode = Episode::factory()->create(['local' => 1]);
 
-        $this->artisan('download')
+        $this->artisan('download --sleep=0')
             ->expectsOutput('There are no episodes available to download.')
             ->assertExitCode(0);
     }
@@ -48,7 +48,7 @@ class DownloadMp3Test extends TestCase
         Episode::factory()->create(['local' => 0]);
         Episode::factory()->create(['local' => 0]);
 
-        $this->artisan('download 2');
+        $this->artisan('download 2 --sleep=0');
 
         Queue::assertPushed(DownloadEpisodeJob::class, 2);
     }
@@ -58,8 +58,32 @@ class DownloadMp3Test extends TestCase
     {
         Episode::factory()->create(['program' => 'The Ross Report', 'local' => 0]);
 
-        $this->artisan('download')
+        $this->artisan('download --sleep=0')
             ->expectsOutput('There are no episodes available to download.')
             ->assertExitCode(0);
+    }
+
+    /** @test */
+    public function the_application_will_wait_10_seconds_inbetween_download_attempts_by_default()
+    {
+        Episode::factory()->create(['local' => 0]);
+
+        $start = microtime(true);
+        $this->artisan('download');
+        $time = microtime(true) - $start;
+
+        $this->assertEquals(10, floor($time));
+    }
+
+    /** @test */
+    public function you_can_specify_how_long_to_wait_inbetween_download_attempts()
+    {
+        Episode::factory()->create(['local' => 0]);
+
+        $start = microtime(true);
+        $this->artisan('download --sleep=2');
+        $time = microtime(true) - $start;
+
+        $this->assertEquals(2, floor($time));
     }
 }

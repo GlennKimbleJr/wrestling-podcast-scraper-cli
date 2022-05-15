@@ -16,7 +16,7 @@ class DownloadMp3 extends Command
      *
      * @var string
      */
-    protected $signature = 'download {amount=1}';
+    protected $signature = 'download {amount=1} {--sleep=10}';
 
     /**
      * The console command description.
@@ -59,7 +59,11 @@ class DownloadMp3 extends Command
             $this->printDetails($episode);
             $this->download($episode);
             $this->info("{$count} of {$amount} Complete");
-            $this->sleep();
+
+            // The number of seconds to wait in-between download attempts.
+            if ($sleepSeconds = (int) $this->option('sleep')) {
+                sleep($sleepSeconds);
+            }
 
             $count++;
         }
@@ -113,19 +117,5 @@ class DownloadMp3 extends Command
             $this->errors[] = $episode->id;
             $this->error('Error while downloading.');
         }
-    }
-
-    /**
-     * Sleep for a given numer of seconds. Used for rate limiting.
-     *
-     * @return void
-     */
-    private function sleep(): void
-    {
-        if (App::runningUnitTests()) {
-            return;
-        }
-
-        sleep(10);
     }
 }
