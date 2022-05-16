@@ -1,9 +1,8 @@
 <?php
 
-use App\Models\Episode;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EpisodeController;
+use App\Http\Controllers\ProgramController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,30 +15,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('index', [
-        'programs' => Episode::getProgramsList(),
-        'episodes' => Episode::canStreamLocally()
-            ->orderByDesc('published_at')
-            ->get(),
-    ]);
-})->name('index');
-
-Route::get('/programs/{program}', function (Request $request, string $program) {
-    return view('index', [
-        'selectedProgram' => $program,
-        'programs' => Episode::getProgramsList(),
-        'episodes' => Episode::canStreamLocally()
-            ->whereProgram(
-                Str::of($program)->replace('-', ' ')->title()
-            )
-            ->orderByDesc('published_at')
-            ->get(),
-    ]);
-})->name('program');
-
-Route::get('/episodes/{episode}', function(Request $request, Episode $episode) {
-    return view('episode', [
-        'episode' => $episode,
-    ]);
-})->name('episode');
+Route::get('/', [EpisodeController::class, 'index'])->name('index');
+Route::get('/episodes/{episode}', [EpisodeController::class, 'show'])->name('episode');
+Route::get('/programs/{program}', [ProgramController::class, 'show'])->name('program');
