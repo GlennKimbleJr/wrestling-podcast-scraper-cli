@@ -70,6 +70,6 @@ class Episode extends Model
 
     public function getProgramSlugAttribute()
     {
-        return Str::of($this->program)->slug('-');
+        return (string) Str::of($this->program)->slug('-');
     }
 }
