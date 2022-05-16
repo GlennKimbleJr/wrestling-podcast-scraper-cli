@@ -58,16 +58,7 @@ class DownloadMp3 extends Command
             $this->printDetails($episode);
             $this->download($episode);
             $this->info("{$count} of {$amount} Complete");
-
-            // The number of seconds to wait in-between download attempts.
-            if ($sleepSeconds = (int) $this->option('sleep')) {
-                // We don't need to wait after the final iteration.
-                if ($count == $amount) {
-                    continue;
-                }
-
-                sleep($sleepSeconds);
-            }
+            $this->sleep($count, $amount);
 
             $count++;
         }
@@ -129,5 +120,29 @@ class DownloadMp3 extends Command
             $this->errors[] = $episode->id;
             $this->error('Error while downloading.');
         }
+    }
+
+    /**
+     * Wait in-betwen download attempts.
+     *
+     * @param int $iterationCount
+     * @param int $interationAmount
+     *
+     * @return void
+     */
+    private function sleep(int $iterationCount, int $interationAmount): void
+    {
+        $numberOfSecondsToWait = (int) $this->option('sleep');
+
+        if (! $numberOfSecondsToWait) {
+            return;
+        }
+
+        // We don't need to wait after the final iteration.
+        if ($iterationCount == $interationAmount) {
+            return;
+        }
+
+        sleep($numberOfSecondsToWait);
     }
 }
