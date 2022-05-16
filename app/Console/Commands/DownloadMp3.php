@@ -2,12 +2,11 @@
 
 namespace App\Console\Commands;
 
+use Http;
+use Storage;
 use Exception;
-use Carbon\Carbon;
 use App\Models\Episode;
 use Illuminate\Console\Command;
-use App\Jobs\DownloadEpisodeJob;
-use Illuminate\Support\Facades\App;
 
 class DownloadMp3 extends Command
 {
@@ -112,7 +111,15 @@ class DownloadMp3 extends Command
     private function download(Episode $episode): void
     {
         try {
-            DownloadEpisodeJob::dispatch($episode);
+            $temporaryMp3File = tmpfile();
+
+            Http::get($episode->mp3, [
+              'sink' => $temporaryMp3File,
+            ]);
+
+            Storage::put($episode->local_mp3_path, $temporaryMp3File);
+
+            $episode->update(['local' => true]);
         } catch (Exception $e) {
             $this->errors[] = $episode->id;
             $this->error('Error while downloading.');

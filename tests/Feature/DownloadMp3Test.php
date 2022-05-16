@@ -2,11 +2,12 @@
 
 namespace Tests\Feature;
 
+use Http;
+use Storage;
 use Exception;
 use App\Jobs\DownloadEpisodeJob;
 use App\Models\Episode;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class DownloadMp3Test extends TestCase
@@ -17,7 +18,8 @@ class DownloadMp3Test extends TestCase
     {
         parent::setUp();
 
-        Queue::fake();
+        Storage::fake();
+        Http::fake(Http::response('Fake response for the mp3.', 200));
     }
 
     /**
@@ -57,9 +59,7 @@ class DownloadMp3Test extends TestCase
 
         $this->artisan('download --sleep=0');
 
-        Queue::assertPushed(function (DownloadEpisodeJob $job) use ($nonLocalEpisode) {
-            return $job->episode->is($nonLocalEpisode);
-        });
+        Storage::assertExists($nonLocalEpisode->local_mp3_path);
     }
 
     /** @test */
@@ -70,26 +70,31 @@ class DownloadMp3Test extends TestCase
         $this->artisan('download --sleep=0')
             ->expectsOutput('There are no episodes available to download.')
             ->assertExitCode(0);
+
+        Storage::assertMissing($nonLocalEpisode->local_mp3_path);
     }
 
     /** @test */
     public function multiple_episodes_can_be_downloaded_at_once()
     {
-        Episode::factory()->create(['local' => 0]);
-        Episode::factory()->create(['local' => 0]);
+        $episode1 = Episode::factory()->create(['local' => 0]);
+        $episode2 = Episode::factory()->create(['local' => 0]);
 
         $this->artisan('download 2 --sleep=0');
 
-        Queue::assertPushed(DownloadEpisodeJob::class, 2);
+        Storage::assertExists($episode1->local_mp3_path);
+        Storage::assertExists($episode2->local_mp3_path);
     }
 
     /** @test */
     public function the_ross_report_will_not_be_downloaded()
     {
-        Episode::factory()->create(['program' => 'The Ross Report', 'local' => 0]);
+        $episode = Episode::factory()->create(['program' => 'The Ross Report', 'local' => 0]);
 
         $this->artisan('download --sleep=0')
             ->expectsOutput('There are no episodes available to download.')
             ->assertExitCode(0);
+
+        Storage::assertMissing($episode->local_mp3_path);
     }
 }
