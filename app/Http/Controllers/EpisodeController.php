@@ -32,6 +32,7 @@ class EpisodeController extends Controller
         return view('index', [
             'programs' => Episode::getProgramsList(),
             'episodes' => $episodes,
+            'selectedProgram' => $request->get('program'),
         ]);
     }
 
