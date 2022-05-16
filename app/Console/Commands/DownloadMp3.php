@@ -61,6 +61,11 @@ class DownloadMp3 extends Command
 
             // The number of seconds to wait in-between download attempts.
             if ($sleepSeconds = (int) $this->option('sleep')) {
+                // We don't need to wait after the final iteration.
+                if ($count == $amount) {
+                    continue;
+                }
+
                 sleep($sleepSeconds);
             }
 

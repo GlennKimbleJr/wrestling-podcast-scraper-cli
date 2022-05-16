@@ -29,9 +29,10 @@ class DownloadMp3Test extends TestCase
     public function the_application_will_wait_10_seconds_inbetween_download_attempts_by_default()
     {
         Episode::factory()->create(['local' => 0]);
+        Episode::factory()->create(['local' => 0]);
 
         $start = microtime(true);
-        $this->artisan('download');
+        $this->artisan('download 2');
         $time = microtime(true) - $start;
 
         $this->assertEquals(10, floor($time));
@@ -44,9 +45,10 @@ class DownloadMp3Test extends TestCase
     public function you_can_specify_how_long_to_wait_inbetween_download_attempts()
     {
         Episode::factory()->create(['local' => 0]);
+        Episode::factory()->create(['local' => 0]);
 
         $start = microtime(true);
-        $this->artisan('download --sleep=2');
+        $this->artisan('download 2 --sleep=2');
         $time = microtime(true) - $start;
 
         $this->assertEquals(2, floor($time));
