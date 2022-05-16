@@ -20,11 +20,12 @@ class DownloadMp3Test extends TestCase
         Queue::fake();
     }
 
-    /** @test */
+    /**
+     * @test
+     * @group slow
+     */
     public function the_application_will_wait_10_seconds_inbetween_download_attempts_by_default()
     {
-        $this->markTestSkipped('Skip time based tests to now slow down the test suite.');
-
         Episode::factory()->create(['local' => 0]);
 
         $start = microtime(true);
@@ -34,11 +35,12 @@ class DownloadMp3Test extends TestCase
         $this->assertEquals(10, floor($time));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @group slow
+     */
     public function you_can_specify_how_long_to_wait_inbetween_download_attempts()
     {
-        $this->markTestSkipped('Skip time based tests to now slow down the test suite.');
-
         Episode::factory()->create(['local' => 0]);
 
         $start = microtime(true);
