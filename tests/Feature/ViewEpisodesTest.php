@@ -37,7 +37,7 @@ class ViewEpisodesTest extends TestCase
         $expectedEpisode2 = Episode::factory()->create(['program' => 'What Happened When']);
         $unexpectedEpisode = Episode::factory()->create(['program' => 'The Ross Report']);
 
-        $this->get(route('program', ['what-happened-when']))
+        $this->get(route('index', ['program' => 'what-happened-when']))
             ->assertStatus(200)
             ->assertViewHas('episodes', function ($episodes)
                 use ($expectedEpisode1, $expectedEpisode2, $unexpectedEpisode) {

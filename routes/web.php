@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EpisodeController;
-use App\Http\Controllers\ProgramController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,4 +16,3 @@ use App\Http\Controllers\ProgramController;
 
 Route::get('/', [EpisodeController::class, 'index'])->name('index');
 Route::get('/episodes/{episode}', [EpisodeController::class, 'show'])->name('episode');
-Route::get('/programs/{program}', [ProgramController::class, 'show'])->name('program');
