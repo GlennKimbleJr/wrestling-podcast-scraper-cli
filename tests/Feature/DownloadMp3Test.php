@@ -21,6 +21,34 @@ class DownloadMp3Test extends TestCase
     }
 
     /** @test */
+    public function the_application_will_wait_10_seconds_inbetween_download_attempts_by_default()
+    {
+        $this->markTestSkipped('Skip time based tests to now slow down the test suite.');
+
+        Episode::factory()->create(['local' => 0]);
+
+        $start = microtime(true);
+        $this->artisan('download');
+        $time = microtime(true) - $start;
+
+        $this->assertEquals(10, floor($time));
+    }
+
+    /** @test */
+    public function you_can_specify_how_long_to_wait_inbetween_download_attempts()
+    {
+        $this->markTestSkipped('Skip time based tests to now slow down the test suite.');
+
+        Episode::factory()->create(['local' => 0]);
+
+        $start = microtime(true);
+        $this->artisan('download --sleep=2');
+        $time = microtime(true) - $start;
+
+        $this->assertEquals(2, floor($time));
+    }
+
+    /** @test */
     public function a_non_local_episode_will_be_downloaded()
     {
         $nonLocalEpisode = Episode::factory()->create(['local' => 0]);
@@ -61,29 +89,5 @@ class DownloadMp3Test extends TestCase
         $this->artisan('download --sleep=0')
             ->expectsOutput('There are no episodes available to download.')
             ->assertExitCode(0);
-    }
-
-    /** @test */
-    public function the_application_will_wait_10_seconds_inbetween_download_attempts_by_default()
-    {
-        Episode::factory()->create(['local' => 0]);
-
-        $start = microtime(true);
-        $this->artisan('download');
-        $time = microtime(true) - $start;
-
-        $this->assertEquals(10, floor($time));
-    }
-
-    /** @test */
-    public function you_can_specify_how_long_to_wait_inbetween_download_attempts()
-    {
-        Episode::factory()->create(['local' => 0]);
-
-        $start = microtime(true);
-        $this->artisan('download --sleep=2');
-        $time = microtime(true) - $start;
-
-        $this->assertEquals(2, floor($time));
     }
 }
