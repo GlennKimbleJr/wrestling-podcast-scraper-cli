@@ -48,6 +48,13 @@ class ViewEpisodesTest extends TestCase
     }
 
     /** @test */
+    public function a_valid_program_must_be_specified()
+    {
+        $this->get(route('index', ['program' => 'some-invalid-program']))
+            ->assertStatus(404);
+    }
+
+    /** @test */
     public function individual_episodes_can_be_viewed()
     {
         $expectedEpisode = Episode::factory()->create();
