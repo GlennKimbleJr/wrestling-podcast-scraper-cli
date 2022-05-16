@@ -2,13 +2,12 @@
 
 namespace Tests\Helpers;
 
-use GuzzleHttp\Psr7\Response;
-
+use Http;
 
 class CreateMegaphoneResponse
 {
     private $statusCode = 200;
-    private $nextUrl = null;
+    private $url = '*';
     private $episodes = [];
 
     public static function init()
@@ -18,9 +17,24 @@ class CreateMegaphoneResponse
 
     public function generate()
     {
-        return new Response($this->statusCode, [], json_encode([
-            'episodes' => $this->episodes,
-        ]));
+        $response = [
+            $this->url => Http::response([
+                    'episodes' => $this->episodes,
+                ],
+                $this->statusCode,
+            ),
+        ];
+
+        /**
+         * The default $url property is a catch-all "*". So if we are overriding that to
+         * a specific url then we want to add a new catch all to any other url
+         * specified to return a 404 response.
+         */
+        if ($this->url !== '*') {
+            $response['*'] = Http::response('Not Found', 404);
+        }
+
+        return $response;
     }
 
     public function setStatusCode(int $code): self
@@ -30,9 +44,9 @@ class CreateMegaphoneResponse
         return $this;
     }
 
-    public function setNextUrl(?string $url): self
+    public function setUrl(?string $url): self
     {
-        $this->nextUrl = $url;
+        $this->url = $url;
 
         return $this;
     }

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use Mockery;
+use Http;
 use Carbon\Carbon;
 use Tests\TestCase;
 use GuzzleHttp\Client;
@@ -14,31 +14,15 @@ class ScrapeGrillingJRTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * @var Client
-     */
-    protected $mockClient;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->mockClient = Mockery::mock(Client::class);
-        $this->app->instance(Client::class, $this->mockClient);
-    }
-
     /** @test */
     public function podcast_can_be_scraped()
     {
-        $response = CreateMegaphoneResponse::init()
-            ->addEpisode()
-            ->generate();
-
-        $this->mockClient
-            ->shouldReceive('get')
-            ->once()
-            ->with('https://player.megaphone.fm/playlist/WWO8396779805')
-            ->andReturn($response);
+        Http::fake(
+            CreateMegaphoneResponse::init()
+                ->setUrl('https://player.megaphone.fm/playlist/WWO8396779805')
+                ->addEpisode()
+                ->generate()
+        );
 
         $this->artisan('scrape grilling-jr');
 
@@ -58,11 +42,13 @@ class ScrapeGrillingJRTest extends TestCase
     /** @test */
     public function early_episodes_program_title_are_the_ross_report()
     {
-        $response = CreateMegaphoneResponse::init()->addEpisode([
-        	'pubDate' => Carbon::parse('2019-05-01')->toIso8601String(),
-        ])->generate();
-
-        $this->mockClient->shouldReceive('get')->once()->andReturn($response);
+        Http::fake(
+            CreateMegaphoneResponse::init()
+                ->addEpisode([
+                    'pubDate' => Carbon::parse('2019-05-01')->toIso8601String(),
+                ])
+                ->generate()
+        );
 
         $this->artisan('scrape grilling-jr');
 
@@ -72,11 +58,13 @@ class ScrapeGrillingJRTest extends TestCase
     /** @test */
     public function later_episodes_program_title_are_grilling_jr()
     {
-        $response = CreateMegaphoneResponse::init()->addEpisode([
-        	'pubDate' => Carbon::parse('2019-05-02')->toIso8601String(),
-        ])->generate();
-
-        $this->mockClient->shouldReceive('get')->once()->andReturn($response);
+        Http::fake(
+            CreateMegaphoneResponse::init()
+                ->addEpisode([
+                    'pubDate' => Carbon::parse('2019-05-02')->toIso8601String(),
+                ])
+                ->generate()
+        );
 
         $this->artisan('scrape grilling-jr');
 

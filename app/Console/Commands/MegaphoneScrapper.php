@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
+use Http;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Episode;
-use GuzzleHttp\Client;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
@@ -25,13 +25,6 @@ class MegaphoneScrapper extends Command
      * @var string
      */
     protected $description = 'Download episodes of various podcasts from megaphone.fm';
-
-    /**
-     * The GuzzleHttp client.
-     *
-     * @var Client
-     */
-    protected $client;
 
     /**
      * The number of episodes added while parsing.
@@ -77,18 +70,6 @@ class MegaphoneScrapper extends Command
     ];
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct(Client $client)
-    {
-        parent::__construct();
-
-        $this->client = $client;
-    }
-
-    /**
      * Execute the console command.
      *
      * @return int
@@ -101,20 +82,16 @@ class MegaphoneScrapper extends Command
             return 1;
         }
 
-        $response = $this->client->get($this->getUrl());
+        $response = Http::get($this->getUrl());
 
-        if ($response->getStatusCode() !== 200) {
+        if ($response->failed()) {
             $this->error('Error retrieving rss feed.');
 
             return 1;
         }
 
-        $contents = json_decode(
-            $response->getBody()->getContents()
-        );
-
-        foreach ($contents->episodes as $episode) {
-            if ($this->storeNewEpisode($episode)) {
+        foreach ($response->json('episodes') as $episode) {
+            if ($this->storeNewEpisode((object) $episode)) {
                 $this->added++;
             }
         }

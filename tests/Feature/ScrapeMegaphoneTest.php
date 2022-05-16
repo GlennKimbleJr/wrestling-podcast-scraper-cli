@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Commands;
 
-use Mockery;
+use Http;
 use Exception;
 use Tests\TestCase;
 use GuzzleHttp\Client;
@@ -15,74 +15,54 @@ class ScrapeMegaphoneTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * @var Client
+     * @test
+     * @dataProvider programListProvider
      */
-    protected $mockClient;
-
-    public function setUp(): void
+    public function a_valid_program_must_be_specified($program, $programTitle)
     {
-        parent::setUp();
+        Http::fake(
+            CreateMegaphoneResponse::init()->addEpisode()->generate()
+        );
 
-        $this->mockClient = Mockery::mock(Client::class);
-        $this->app->instance(Client::class, $this->mockClient);
+        $this->artisan("scrape {$program}");
+
+        $this->assertEquals(1, Episode::whereProgram($programTitle)->count());
+    }
+
+    /**
+     * Data provider for a_valid_program_must_be_specified test.
+     *
+     * @return \string[][]
+     */
+    public function programListProvider()
+    {
+        return [
+            ['83-weeks', '83 Weeks'],
+            ['my-world', 'My World'],
+            ['whw', 'What Happened When'],
+            ['grilling-jr', 'Grilling JR'],
+            ['something', 'Something to Wrestle'],
+            ['arn', 'ARN'],
+            ['kurt-angle', 'The Kurt Angle Show'],
+        ];
     }
 
     /** @test */
-    public function a_valid_program_must_be_specified()
+    public function an_invalid_program_may_not_be_specified()
     {
-        $response = CreateMegaphoneResponse::init()->addEpisode(['uid' => 1])->generate();
-        $this->mockClient->shouldReceive('get')->once()->andReturn($response);
-        $this->artisan('scrape 83-weeks');
-        $this->assertEquals(1, Episode::whereProgram('83 Weeks')->count());
+        Http::fake();
 
-        $response = CreateMegaphoneResponse::init()->addEpisode(['uid' => 2])->generate();
-        $this->mockClient->shouldReceive('get')->once()->andReturn($response);
-        $this->artisan('scrape my-world');
-        $this->assertEquals(1, Episode::whereProgram('My World')->count());
-
-        $response = CreateMegaphoneResponse::init()->addEpisode(['uid' => 3])->generate();
-        $this->mockClient->shouldReceive('get')->once()->andReturn($response);
-        $this->artisan('scrape whw');
-        $this->assertEquals(1, Episode::whereProgram('What Happened When')->count());
-
-        $response = CreateMegaphoneResponse::init()->addEpisode(['uid' => 4])->generate();
-        $this->mockClient->shouldReceive('get')->once()->andReturn($response);
-        $this->artisan('scrape grilling-jr');
-        $this->assertEquals(1, Episode::whereProgram('Grilling JR')->count());
-
-        $response = CreateMegaphoneResponse::init()->addEpisode(['uid' => 5])->generate();
-        $this->mockClient->shouldReceive('get')->once()->andReturn($response);
-        $this->artisan('scrape something');
-        $this->assertEquals(1, Episode::whereProgram('Something to Wrestle')->count());
-
-        $response = CreateMegaphoneResponse::init()->addEpisode(['uid' => 6])->generate();
-        $this->mockClient->shouldReceive('get')->once()->andReturn($response);
-        $this->artisan('scrape arn');
-        $this->assertEquals(1, Episode::whereProgram('ARN')->count());
-
-        $response = CreateMegaphoneResponse::init()->addEpisode(['uid' => 7])->generate();
-        $this->mockClient->shouldReceive('get')->once()->andReturn($response);
-        $this->artisan('scrape kurt-angle');
-        $this->assertEquals(1, Episode::whereProgram('The Kurt Angle Show')->count());
-
-        $this->mockClient->shouldReceive('get')->never();
         $this->artisan('scrape invalid-program')
             ->expectsOutput('Invalid program')
             ->assertExitCode(1);
+
+        Http::assertNothingSent();
     }
 
     /** @test */
     public function a_200_status_code_must_be_returned()
     {
-        $response = CreateMegaphoneResponse::init()
-            ->setStatusCode(404)
-            ->addEpisode()
-            ->generate();
-
-        $this->mockClient
-            ->shouldReceive('get')
-            ->once()
-            ->andReturn($response);
+        Http::fakeSequence()->pushStatus(404);
 
         $this->artisan('scrape 83-weeks')
             ->expectsOutput('Error retrieving rss feed.')

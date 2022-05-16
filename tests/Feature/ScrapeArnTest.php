@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use Mockery;
+use Http;
 use Carbon\Carbon;
 use Tests\TestCase;
 use GuzzleHttp\Client;
@@ -14,31 +14,15 @@ class ScrapeArnTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * @var Client
-     */
-    protected $mockClient;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->mockClient = Mockery::mock(Client::class);
-        $this->app->instance(Client::class, $this->mockClient);
-    }
-
     /** @test */
     public function podcast_can_be_scraped()
     {
-        $response = CreateMegaphoneResponse::init()
-            ->addEpisode()
-            ->generate();
-
-        $this->mockClient
-            ->shouldReceive('get')
-            ->once()
-            ->with('https://player.megaphone.fm/playlist/WWO1389089569')
-            ->andReturn($response);
+        Http::fake(
+            CreateMegaphoneResponse::init()
+                ->setUrl('https://player.megaphone.fm/playlist/WWO1389089569')
+                ->addEpisode()
+                ->generate()
+        );
 
         $this->artisan('scrape arn');
 
