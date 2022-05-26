@@ -75,6 +75,10 @@ class MegaphoneScrapper extends Command
             'id' => 'PHL8312998046',
             'title' => 'Oh You Didnt Know',
         ],
+        'hardy' => [
+            'id' => 'PHL6089404039',
+            'title' => 'The Extreme Life of Matt Hardy',
+        ],
     ];
 
     /**

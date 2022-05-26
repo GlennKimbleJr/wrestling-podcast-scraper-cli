@@ -46,6 +46,7 @@ class ScrapeMegaphoneTest extends TestCase
             ['kurt-angle', 'The Kurt Angle Show'],
             ['flair', 'To Be The Man'],
             ['road-dogg', 'Oh You Didnt Know'],
+            ['hardy', 'The Extreme Life of Matt Hardy'],
         ];
     }
 
