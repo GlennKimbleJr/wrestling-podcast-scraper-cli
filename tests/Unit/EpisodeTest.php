@@ -64,7 +64,7 @@ class EpisodeTest extends TestCase
             'published_at' => Carbon::parse('December 26, 2012'),
         ]);
 
-        $expectedPath = "/mp3s/83 Weeks/2012-12-26-k123.mp3";
+        $expectedPath = "/storage//mp3s/83 Weeks/2012-12-26-k123.mp3";
 
         $this->assertEquals($expectedPath, $episode->local_mp3_path);
     }

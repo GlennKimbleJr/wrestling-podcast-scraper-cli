@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Storage;
 use Illuminate\Support\Str;
 use Database\Factories\EpisodeFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -63,9 +64,11 @@ class Episode extends Model
 
     public function getLocalMp3PathAttribute()
     {
-        return "/mp3s/{$this->program}/"
+        return Storage::url(
+            "/mp3s/{$this->program}/"
             . $this->published_at->format('Y-m-d')
-            . "-{$this->source_id}.mp3";
+            . "-{$this->source_id}.mp3"
+        );
     }
 
     public function getProgramSlugAttribute()
