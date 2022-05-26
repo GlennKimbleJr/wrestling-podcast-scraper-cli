@@ -79,6 +79,10 @@ class MegaphoneScrapper extends Command
             'id' => 'PHL6089404039',
             'title' => 'The Extreme Life of Matt Hardy',
         ],
+        'ddp' => [
+            'id' => 'PHL1466141192',
+            'title' => 'DDP Snake Pit',
+        ],
     ];
 
     /**
