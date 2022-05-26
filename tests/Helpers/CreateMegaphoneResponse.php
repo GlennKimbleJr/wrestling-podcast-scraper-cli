@@ -37,6 +37,11 @@ class CreateMegaphoneResponse
         return $response;
     }
 
+    public function generateForSequence()
+    {
+        return ['episodes' => $this->episodes];
+    }
+
     public function setStatusCode(int $code): self
     {
         $this->statusCode = $code;

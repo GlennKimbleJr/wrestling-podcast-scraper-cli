@@ -76,4 +76,57 @@ class ScrapeMegaphoneTest extends TestCase
 
         $this->assertEquals(0, Episode::count());
     }
+
+    /** @test */
+    public function passing_in_all_in_place_of_a_program_will_scrape_all_programs()
+    {
+        $response = CreateMegaphoneResponse::init()->addEpisode()->generateForSequence();
+
+        Http::fakeSequence()
+            ->push($response, 200)
+            ->push($this->incrementUid($response), 200)
+            ->push($this->incrementUid($response), 200)
+            ->push($this->incrementUid($response), 200)
+            ->push($this->incrementUid($response), 200)
+            ->push($this->incrementUid($response), 200)
+            ->push($this->incrementUid($response), 200)
+            ->push($this->incrementUid($response), 200)
+            ->push($this->incrementUid($response), 200)
+            ->push($this->incrementUid($response), 200)
+            ->push($this->incrementUid($response), 200)
+            ->push($this->incrementUid($response), 200)
+            ->push($this->incrementUid($response), 200);
+
+        $this->artisan('scrape all')
+            ->expectsOutput('83 Weeks')
+            ->expectsOutput('My World')
+            ->expectsOutput('What Happened When')
+            ->expectsOutput('Grilling JR')
+            ->expectsOutput('Something to Wrestle')
+            ->expectsOutput('ARN')
+            ->expectsOutput('The Kurt Angle Show')
+            ->expectsOutput('To Be The Man')
+            ->expectsOutput('Oh You Didnt Know')
+            ->expectsOutput('The Extreme Life of Matt Hardy')
+            ->expectsOutput('DDP Snake Pit')
+            ->expectsOutput('Foley Is Pod')
+            ->expectsOutput('Gentleman Villain')
+            ->assertExitCode(0);
+
+        // Prooves that 1 episode was scrapped for each podcast.
+        $this->assertEquals(13, Episode::count());
+    }
+
+    /**
+     * Increment the UUID in the array so we can reuse it for different podcasts without conflicts.
+     *
+     * @param $array array
+     * @return array
+     */
+    private function incrementUid(array &$array): array
+    {
+        $array['episodes'][0]['uid']++;
+
+        return $array;
+    }
 }

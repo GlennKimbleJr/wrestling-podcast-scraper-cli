@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Http;
+use Artisan;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Episode;
@@ -100,6 +101,12 @@ class MegaphoneScrapper extends Command
      */
     public function handle(): int
     {
+        if ($this->argument('program') === 'all') {
+            $this->scrapeAllPrograms();
+
+            return 0;
+        }
+
         if (! $this->isValidProgram()) {
             $this->error('Invalid program');
 
@@ -125,6 +132,28 @@ class MegaphoneScrapper extends Command
         );
 
         return 0;
+    }
+
+    /**
+     * Cycle through the list of programs and call the scrape command with each.
+     *
+     * @return void
+     */
+    private function scrapeAllPrograms(): void
+    {
+        $startingEpisodeCount = Episode::count();
+
+        foreach ($this->programs as $key => $value) {
+            $this->info($value['title']);
+            $this->call('scrape', ['program' => $key]);
+            $this->newLine();
+        }
+
+        $added = Episode::count() - $startingEpisodeCount;
+
+        $this->warn(
+            "Finished with {$added} " . Str::plural('episode', $added) . '.'
+        );
     }
 
     /**
