@@ -83,6 +83,10 @@ class MegaphoneScrapper extends Command
             'id' => 'PHL1466141192',
             'title' => 'DDP Snake Pit',
         ],
+        'foley' => [
+            'id' => 'PHL4244076691',
+            'title' => 'Foley Is Pod',
+        ],
     ];
 
     /**
