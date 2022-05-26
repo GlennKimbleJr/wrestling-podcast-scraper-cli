@@ -67,6 +67,10 @@ class MegaphoneScrapper extends Command
             'id' => 'WWO7281860247',
             'title' => 'The Kurt Angle Show',
         ],
+        'flair' => [
+            'id' => 'PHL6641370953',
+            'title' => 'To Be The Man',
+        ],
     ];
 
     /**
@@ -164,6 +168,10 @@ class MegaphoneScrapper extends Command
             return 'The Ross Report';
         }
 
+        if ($program == 'flair' && $publishedAt->lte($this->getWoooooNationUncensoredCutoffDate())) {
+            return 'WOOOOO Nation Uncensored';
+        }
+
         return (string) Arr::get($this->programs, "{$program}.title");
     }
 
@@ -175,5 +183,15 @@ class MegaphoneScrapper extends Command
     private function getRossReportCutoffDate(): Carbon
     {
         return Carbon::parse('2019-05-01')->endOfDay();
+    }
+
+    /**
+     * Get the cutoff date for when The Ross Report becomes Grilling Jr.
+     *
+     * @return Carbon
+     */
+    private function getWoooooNationUncensoredCutoffDate(): Carbon
+    {
+        return Carbon::parse('2022-04-20')->endOfDay();
     }
 }
