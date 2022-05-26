@@ -2,11 +2,13 @@
 
 namespace App\Console\Commands;
 
+use Str;
 use Http;
 use Storage;
 use Exception;
 use App\Models\Episode;
 use Illuminate\Console\Command;
+use Spatie\TemporaryDirectory\TemporaryDirectory;
 
 class DownloadMp3 extends Command
 {
@@ -107,13 +109,17 @@ class DownloadMp3 extends Command
     private function download(Episode $episode): void
     {
         try {
-            $temporaryMp3File = tmpfile();
+            $temporaryDirectory = (new TemporaryDirectory)->create();
+            $temporaryMp3Path = $temporaryDirectory->path('wrestling/temp.mp3');
 
-            Http::get($episode->mp3, [
-              'sink' => $temporaryMp3File,
-            ]);
+            Http::sink($temporaryMp3Path)->get($episode->mp3);
 
-            Storage::put($episode->local_mp3_path, $temporaryMp3File);
+            Storage::put(
+                (string) Str::of($episode->local_mp3_path)->replaceFirst('/storage/', '/public/'),
+                file_get_contents($temporaryMp3Path)
+            );
+
+            $temporaryDirectory->delete();
 
             $episode->update(['local' => true]);
         } catch (Exception $e) {

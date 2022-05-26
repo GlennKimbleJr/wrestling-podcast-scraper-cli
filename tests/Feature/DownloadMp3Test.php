@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Str;
 use Http;
 use Storage;
 use Exception;
@@ -61,7 +62,9 @@ class DownloadMp3Test extends TestCase
 
         $this->artisan('download --sleep=0');
 
-        Storage::assertExists($nonLocalEpisode->local_mp3_path);
+        Storage::assertExists(
+            (string) Str::of($nonLocalEpisode->local_mp3_path)->replaceFirst('/storage/', '/public/'),
+        );
     }
 
     /** @test */
@@ -73,7 +76,9 @@ class DownloadMp3Test extends TestCase
             ->expectsOutput('There are no episodes available to download.')
             ->assertExitCode(0);
 
-        Storage::assertMissing($nonLocalEpisode->local_mp3_path);
+        Storage::assertMissing(
+            (string) Str::of($nonLocalEpisode->local_mp3_path)->replaceFirst('/storage/', '/public/'),
+        );
     }
 
     /** @test */
@@ -84,8 +89,13 @@ class DownloadMp3Test extends TestCase
 
         $this->artisan('download 2 --sleep=0');
 
-        Storage::assertExists($episode1->local_mp3_path);
-        Storage::assertExists($episode2->local_mp3_path);
+        Storage::assertExists(
+            (string) Str::of($episode1->local_mp3_path)->replaceFirst('/storage/', '/public/'),
+        );
+
+        Storage::assertExists(
+            (string) Str::of($episode2->local_mp3_path)->replaceFirst('/storage/', '/public/'),
+        );
     }
 
     /** @test */
@@ -97,6 +107,8 @@ class DownloadMp3Test extends TestCase
             ->expectsOutput('There are no episodes available to download.')
             ->assertExitCode(0);
 
-        Storage::assertMissing($episode->local_mp3_path);
+        Storage::assertMissing(
+            (string) Str::of($episode->local_mp3_path)->replaceFirst('/storage/', '/public/'),
+        );
     }
 }
