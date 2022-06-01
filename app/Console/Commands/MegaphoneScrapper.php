@@ -101,6 +101,12 @@ class MegaphoneScrapper extends Command
      */
     public function handle(): int
     {
+        /**
+         * This needs to be reset to 0 for instances where this command
+         * is run back to back as part of the same request.
+         */
+        $this->added = 0;
+
         if ($this->argument('program') === 'all') {
             $this->scrapeAllPrograms();
 
